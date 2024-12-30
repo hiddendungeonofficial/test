@@ -1,0 +1,996 @@
+<style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .menu {
+                display: flex;
+                flex-wrap: wrap;
+                background-color: #000;
+                justify-content: center;
+                align-items: center;
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+                border-radius: 4px;
+            }
+            .menu li {
+                position: relative;
+                text-align: center;
+                padding: 6px 16px;
+                border-right: 1px solid #ccc;
+                flex: 1 0 auto;
+                max-width: 170px;
+                font-size: 16px;
+                height: 14px;
+            }
+            .menu li:last-child {
+                border-right: none;
+            }
+            .menu a,
+            .submenu a {
+                display: block;
+                color: silver;
+                text-decoration: none;
+            }
+            .submenu {
+                display: none;
+                position: absolute;
+                background-color: #000;
+                top: 100%;
+                left: 0;
+                width: 170px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 1;
+                text-align: right;
+            }
+            .submenu li {
+                font-size: 14px;
+            }
+            .menu li:hover > .submenu {
+                display: block;
+            }
+            .menu li:hover {
+                background-color: #36454f;
+            }
+            .message {
+                display: none;
+                color: silver;
+                border-radius: 4px;
+                position: relative;
+                margin: 5px auto;
+                text-align: center;
+                font-size: 16px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 50px;
+            }
+            .message.bg-message {
+                background-color: #000;
+            }
+            
+            @media only screen and (max-width: 768px) {
+                .menu li {
+                    flex: 1 0 100%;
+                    border-right: none;
+                    border-bottom: 1px solid #ccc;
+                }
+                .menu li:last-child {
+                    border-bottom: none;
+                }
+            }
+            #logic-board,
+            #music-board {
+                display: none;
+                background-color: #36454f;
+                padding: 20px;
+                border-radius: 10px;
+                width: 300px;
+                margin: 20px auto;
+                text-align: center;
+                color: silver;
+            }
+            #logic-board input,
+            #music-board input {
+                background-color: #000;
+                color: silver;
+                font-size: 14px;
+                border: 1px solid silver;
+                padding: 5px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            .music-controls {
+                margin-top: 10px;
+            }
+            .music-controls span {
+                cursor: pointer;
+                font-size: 14px;
+                margin: 0 10px;
+            }
+            #bingo-board {
+                display: none;
+                background-color: #36454f;
+                padding: 20px;
+                border-radius: 10px;
+                width: 300px;
+                margin: 20px auto;
+                text-align: center;
+                color: silver;
+            }
+            .bingo-grid {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                grid-gap: 5px;
+            }
+            .bingo-cell {
+                background-color: #000;
+                color: silver;
+                border-radius: 5px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 50px;
+                font-size: 18px;
+                cursor: pointer;
+            }
+            .bingo-cell.selected {
+                background-color: #36454f;
+            }
+            .custom-button,
+            .playlist-button {
+                background-color: #000;
+                color: silver;
+                font-size: 12px;
+                border: none;
+                padding: 8px 14px;
+                cursor: pointer;
+            }
+            .color-board {
+                display: none;
+                background-color: #36454f;
+                padding: 20px;
+                border-radius: 10px;
+                width: 300px;
+                margin: 20px auto;
+                text-align: center;
+                color: silver;
+            }
+            .color-board input {
+                background-color: #000;
+                color: silver;
+                font-size: 14px;
+                border: 1px solid silver;
+                padding: 5px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            .post-outer-container {
+                background-color: rgba(0, 0, 0, 0.52);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                z-index: 2;
+                overflow-x: hidden;
+                transition: 0.5s ease;
+                padding-top: 60px;
+            }
+            .overlay-content::-webkit-scrollbar-track {
+                background: #000;
+            }
+            .overlay-content::-webkit-scrollbar-thumb {
+                background-color: #000;
+                border-radius: 4px;
+            }
+            .overlay a.closebtn {
+                position: absolute;
+                top: 25px;
+                right: 20px;
+                font-size: 36px;
+                color: red;
+                text-decoration: none;
+            }
+            .input-container {
+                margin-top: 20px;
+                width: 100%;
+                max-width: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+                background-color: #333;
+            }
+            .input-container input[type="text"] {
+                width: 70%;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                font-size: 11px;
+                margin-right: 10px;
+                background-color: #fff;
+                color: #333;
+            }
+            .input-container input[type="submit"] {
+                padding: 8px 16px;
+                background-color: #000;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 11px;
+            }
+            .gallery {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                align-items: center;
+                margin-top: 10px;
+            }
+            .gallery .gallery-item {
+                position: relative;
+                margin: 10px;
+                width: calc(25% - 20px);
+                cursor: pointer;
+            }
+            .gallery .gallery-item img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+                box-sizing: border-box;
+                display: block;
+                border: 6px solid #fff;
+                transition: transform 0.5s ease, opacity 0.5s ease;
+            }
+            .gallery .gallery-item img:hover {
+                transform: scale(1.15);
+            }
+            .gallery .gallery-item .delete-btn {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+                font-size: 20px;
+                color: #fff;
+                width: 25px;
+                height: 25px;
+                line-height: 25px;
+                text-align: center;
+                cursor: pointer;
+                border-radius: 50%;
+                z-index: 10;
+            }
+            .fullscreen-slideshow {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                z-index: 3;
+                text-align: center;
+                overflow: hidden;
+            }
+            .fullscreen-slideshow img {
+                max-width: 100%;
+                max-height: 100%;
+                margin: auto;
+                display: block;
+                transform: scale(0.9);
+                opacity: 0.1;
+                transition: transform 5s ease, opacity 5s ease;
+            }
+            .fullscreen-slideshow img.active {
+                transform: scale(1);
+                opacity: 1;
+            }
+            .fullscreen-slideshow .closebtn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                font-size: 36px;
+                color: #fff;
+                text-decoration: none;
+                z-index: 4;
+                cursor: pointer;
+            }
+            .slideshow-navigation {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                z-index: 4;
+            }
+            .slideshow-navigation button {
+                background: rgba(0, 0, 0, 0.5);
+                color: #fff;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 10px 20px;
+                outline: 0;
+            }
+            .slideshow-navigation button:hover {
+                background: rgba(0, 0, 0, 0.7);
+            }
+            .fullscreen-slideshow img {
+                max-width: 100%;
+                max-height: 100%;
+                margin: auto;
+                display: block;
+                transform: scale(1);
+                opacity: 1;
+                transition: transform 4s ease, opacity 0.5s ease;
+            }
+        </style>
+    
+
+    
+        <ul class="menu">
+            <li>
+                <a href="javascript:void(0)">Preferences</a>
+                <ul class="submenu">
+                    <li><a href="javascript:void(0)" onclick="toggleMusicBoard()">Play Music</a></li>
+                    <li><a href="javascript:void(0)" onclick="openGallery()">Gallery</a></li>
+                    <li><a href="javascript:void(0)" onclick="toggleColorBoard()">Colors</a></li>
+                    <li><a href="javascript:void(0)" onclick="reset()">Reset</a></li>
+                    <li><a href="javascript:void(0)" onclick="closeMenu()">Close Menu</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Lucky Credits</a>
+                <ul class="submenu">
+                    <li><input type="number" id="betAmountInput" placeholder="" /></li>
+                    <li><a href="javascript:void(0)" onclick='bet("coin flip")'>Coin Flip</a></li>
+                    <li><a href="javascript:void(0)" onclick='bet("dice roll")'>Dice Roll</a></li>
+                    <li><a href="javascript:void(0)" onclick="lottery()">Lottery</a></li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="showCredits()">My Credits💎</a>
+                        <ul class="submenu" id="creditsSubmenu"></ul>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Hits</a>
+                <ul class="submenu">
+                    
+                    <li><a href="javascript:void(0)" onclick="giveToPoor()">Give to Poor</a></li>
+                    <li><a href="javascript:void(0)" onclick="datePartner()">Date a Partner👫</a></li>
+                    <li><a href="javascript:void(0)" onclick="showLogicBoard()">My Logic</a></li>
+                    <li><a href="javascript:void(0)" onclick="startBingo()">Bingo</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Masteries🏆</a>
+                <ul class="submenu" id="achievementsSubmenu"></ul>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Titles🎖️</a>
+                <ul class="submenu" id="titleSubmenu">
+                    <li><a href="javascript:void(0)">No Title</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Profile BG</a>
+                <ul class="submenu">
+                    <li><a href="javascript:void(0)" onclick='setBgImage("https://i.ibb.co/5hSn5yc/1.jpg")'>Default 1</a></li>
+                    <li><a href="javascript:void(0)" onclick='setBgImage("https://i.ibb.co/f0b2cr9/2.jpg")'>Default 2</a></li>
+                    <li><a href="javascript:void(0)" onclick='setBgImage(prompt("Enter the URL of the background image:"))'>Upload</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Profile Cover</a>
+                <ul class="submenu">
+                    <li><a href="javascript:void(0)" onclick='setBannerImage("https://i.ibb.co/FKH7NRd/my-banner-1.png")'>Default 1</a></li>
+                    <li>
+                        <a href="javascript:void(0)" onclick='setBannerImage("https://i.ibb.co/DGbybzz/my-banner.png")'>
+                            Default 2
+                        </a>
+                    </li>
+                    <li><a href="javascript:void(0)" onclick='setBannerImage(prompt("Enter the URL of your custom banner image:"))'>Upload </a></li>
+                </ul>
+            </li>
+            
+        </ul>
+        <div class="message bg-message" id="message"></div>
+        <div id="logic-board">
+            <div id="sequence"></div>
+            <input type="number" id="answerInput" placeholder="Enter your answer" /><button onclick="checkAnswer()" style="background-color: #000; color: silver; font-size: 14px;">Submit</button>
+        </div>
+        <div id="music-board">
+            <input type="text" id="musicUrlInput" placeholder="YouTube or sound cloud" /><button onclick="loadMusic()" style="background-color: #000; color: silver; font-size: 14px;">Playlist url❤️</button>
+            <div class="music-controls"><span onclick="stopMusic()">&#9632;</span></div>
+            <div id="musicPlayerContainer"></div>
+        </div>
+        <div id="bingo-board">
+            <div class="bingo-grid" id="bingoGrid"></div>
+            <div id="bingoNumberDisplay" style="color: silver; font-size: 20px; margin-top: 10px;"></div>
+        </div>
+        <div class="color-board" id="colorBoard">
+            <input type="color" id="backgroundColorInput" value="#000000" /><br />
+            <label for="backgroundColorInput" style="font-size: 14px;">"Background Color"</label><br />
+            <input type="color" id="fontColorInput" value="#C0C0C0" /><br />
+            <label for="fontColorInput" style="font-size: 14px;">"Font Color"</label><br />
+            <input type="color" id="hoverColorInput" value="#36454F" /><br />
+            <label for="hoverColorInput" style="font-size: 14px;">"Hover Color"</label><br />
+            <button class="custom-button" onclick="applyColors()">Apply Colors</button>
+        </div>
+        
+        <div id="galleryOverlay" class="overlay">
+            <div class="overlay-content">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeGallery()">&times;</a>
+                <h1>My Gallery</h1>
+                <div class="input-container"><input type="text" id="imageUrl" placeholder="Enter Image URL" /> <input type="submit" value="Add Image" onclick="addImage()" /></div>
+                <div class="gallery" id="imageGallery"></div>
+            </div>
+        </div>
+        <div id="fullscreenSlideshow" class="fullscreen-slideshow">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeFullscreenSlideshow()">&times;</a>
+            <div class="slideshow-navigation"><button onclick="prevSlide()">&lt; Prev</button><button onclick="nextSlide()">Next &gt;</button></div>
+            <img id="fullscreenImage" />
+        </div>
+        <script>
+            function toggleMusicBoard() {
+                var e = document.getElementById("music-board");
+                "none" === e.style.display || "" === e.style.display ? (e.style.display = "block") : (e.style.display = "none");
+            }
+            function loadMusic() {
+                var e = document.getElementById("musicUrlInput").value,
+                    t = document.getElementById("musicPlayerContainer"),
+                    o = "";
+                if (e.includes("soundcloud.com")) o = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(e);
+                else {
+                    if (!e.includes("youtube.com") && !e.includes("youtu.be")) return void alert("Unsupported URL");
+                    o = "https://www.youtube.com/embed/" + (e.split("v=")[1] || e.split("/").pop());
+                }
+                t.innerHTML = '<iframe width="100%" height="300" src="' + o + '" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
+            }
+            function playMusic() {
+                var e = document.querySelector("#musicPlayerContainer iframe");
+                if (e) {
+                    var t = e.src;
+                    e.src = t + "&autoplay=1";
+                }
+            }
+            function stopMusic() {
+                var e = document.querySelector("#musicPlayerContainer iframe");
+                if (e) {
+                    var t = e.src.split("&autoplay=1")[0];
+                    e.src = t;
+                }
+            }
+         
+            var  
+                defaultBg = document.body.style.backgroundImage,
+                credits = parseInt(localStorage.getItem("credits")) || 0,
+                lastLotteryTime = 0,
+                winPercentage = 0.4,
+                sequence = [],
+                currentAnswer = 0,
+                isMissingNumberQuestion = !1,
+                currentNumber = null,
+                bingoBoardVisible = !1;
+            document.addEventListener("DOMContentLoaded", function () {
+                welcomeUser(), updateAchievementsAndTitles(credits), retrieveStoredImages();
+            });
+            var db,
+                dbPromise = window.indexedDB.open("imageGalleryDB", 1),
+                slideshowImages = [],
+                currentSlideIndex = 0;
+            function welcomeUser() {
+               showMessage("Welcome to the Hidden Dungeon! " + getRandomElement([
+    "Don't worry, the monsters are friendly... for now! 🐉", 
+    "Watch out for traps... but only the ones with cookies 🍪!", 
+    "Grab your sword (or snack) and dive in! ⚔️", 
+    "Hope you brought your map... or just wander around like us! 🧭", 
+    "The dungeon is dark, but the vibes are lit! 💀✨", 
+    "We don't judge you for getting lost. We’re all lost here! 🤷‍♂️", 
+    "Shh... the treasure chest is just behind you... or maybe it’s a mimic! 🏆💀", 
+    "Ready to fight dragons, make friends, and maybe grab some loot? 🐲💎"
+]), "bg-message");
+            }
+            function getRandomElement(e) {
+                return e[Math.floor(Math.random() * e.length)];
+            }
+            function lottery() {
+                var e = Date.now(),
+                    t = e - lastLotteryTime,
+                    o = Math.ceil((6e5 - t) / 6e4);
+                if (t >= 6e5) {
+                    var n = Math.floor(100 * Math.random()) + 30;
+                    (credits += n), showMessage("💘Congrats! You gained " + n + "💎 credits!", "bg-message"), (lastLotteryTime = e), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits);
+                } else alert("Please wait " + o + " minute(s) before trying the lottery again.");
+            }
+            function addImage() {
+                var e = document.getElementById("imageUrl").value.trim();
+                if ("" !== e) {
+                    var t = db.transaction(["images"], "readwrite").objectStore("images").add({ url: e });
+                    (t.onsuccess = function (t) {
+                        var o = document.getElementById("imageGallery"),
+                            n = document.createElement("div");
+                        n.className = "gallery-item";
+                        var r = document.createElement("img");
+                        (r.src = e),
+                            (r.alt = "Image"),
+                            (r.onclick = function () {
+                                openFullscreenSlideshow(e);
+                            }),
+                            n.appendChild(r);
+                        var a = document.createElement("span");
+                        (a.innerHTML = "&times;"),
+                            (a.className = "delete-btn"),
+                            (a.onclick = function () {
+                                o.removeChild(n), deleteImageFromDB(e);
+                            }),
+                            n.appendChild(a),
+                            o.prepend(n),
+                            (document.getElementById("imageUrl").value = "");
+                    }),
+                        (t.onerror = function (e) {
+                            console.error("Error adding image URL to IndexedDB:", t.error);
+                        });
+                }
+            }
+            function nextSlide() {
+                currentSlideIndex = (currentSlideIndex + 1) % slideshowImages.length;
+                var e = document.getElementById("fullscreenImage");
+                e.classList.remove("active"),
+                    setTimeout(function () {
+                        (e.src = slideshowImages[currentSlideIndex]), e.classList.add("active");
+                    }, 500);
+            }
+            function showMessage(e, t) {
+                var o = document.getElementById("message");
+                (o.textContent = e),
+                    (o.className = "message " + t),
+                    (o.style.display = "block"),
+                    setTimeout(function () {
+                        o.style.display = "none";
+                    }, 7e3);
+            }
+            function showLogicBoard() {
+                var e = document.getElementById("logic-board");
+                (e.style.display = "block" === e.style.display ? "none" : "block"), "block" === e.style.display && generateQuestion();
+            }
+            function generateQuestion() {
+                generateSequence(Math.random() < 0.5 ? "next" : "missing");
+            }
+            function generateSequence(e) {
+                sequence = [];
+                var t = Math.floor(10 * Math.random()) + 1;
+                if (0 === (e = Math.floor(3 * Math.random()))) {
+                    for (var o = Math.floor(10 * Math.random()) + 2, n = 0; n < 5; n++) sequence.push(t + n * o);
+                    currentAnswer = t + 5 * o;
+                } else if (1 === e) {
+                    var r = Math.floor(3 * Math.random()) + 2;
+                    for (n = 0; n < 5; n++) sequence.push(t * Math.pow(r, n));
+                    currentAnswer = t * Math.pow(r, 5);
+                } else {
+                    var a = Math.floor(5 * Math.random()) + 1,
+                        s = Math.floor(5 * Math.random()) + 1;
+                    for (n = 0; n < 5; n++) sequence.push(a * n * n + s * n + t);
+                    currentAnswer = 5 * a * 5 + 5 * s + t;
+                }
+                if (0 === e || 1 === e) (isMissingNumberQuestion = !1), (document.getElementById("sequence").textContent = "Find the next number: " + sequence.join(", "));
+                else {
+                    var l = Math.floor(5 * Math.random());
+                    (currentAnswer = sequence[l]), (sequence[l] = "?"), (isMissingNumberQuestion = !0), (document.getElementById("sequence").textContent = "Find the missing number: " + sequence.join(", "));
+                }
+            }
+            function checkAnswer() {
+                parseInt(document.getElementById("answerInput").value) === currentAnswer
+                    ? ((credits += 75), showMessage("Correct🎯! You earned 75💎 credits.", "bg-message"))
+                    : showMessage("Incorrect.🎯 The correct answer was " + currentAnswer + ".", "bg-message"),
+                    updateAchievementsAndTitles(credits),
+                    localStorage.setItem("credits", credits),
+                    (document.getElementById("answerInput").value = ""),
+                    generateQuestion();
+            }
+            function deleteImageFromDB(e) {
+                var t = db.transaction(["images"], "readwrite").objectStore("images").openCursor();
+                (t.onsuccess = function (t) {
+                    var o = t.target.result;
+                    if (o) {
+                        if (o.value.url === e) {
+                            var n = o.delete();
+                            (n.onsuccess = function () {
+                                console.log("Image URL deleted successfully from IndexedDB");
+                            }),
+                                (n.onerror = function () {
+                                    console.error("Error deleting image URL from IndexedDB:", n.error);
+                                });
+                            o.value;
+                            for (var r = document.getElementById("imageGallery"), a = r.getElementsByClassName("gallery-item"), s = 0; s < a.length; s++) {
+                                if (a[s].getElementsByTagName("img")[0].src === e) {
+                                    r.removeChild(a[s]);
+                                    break;
+                                }
+                            }
+                        }
+                        o.continue();
+                    } else console.warn("Image URL not found in IndexedDB");
+                }),
+                    (t.onerror = function (e) {
+                        console.error("Error opening cursor for deleting image URL from IndexedDB:", t.error);
+                    });
+            }
+           
+            function setBannerImage(e) {
+                setImage(document.querySelector(".hero-image.has-image"), e, defaultBanner), localStorage.setItem("bannerImage", e);
+            }
+            (dbPromise.onupgradeneeded = function (e) {
+                (db = e.target.result).objectStoreNames.contains("images") || db.createObjectStore("images", { keyPath: "id", autoIncrement: !0 });
+            }),
+                (dbPromise.onsuccess = function (e) {
+                    (db = e.target.result), loadImagesFromDB();
+                }),
+                (dbPromise.onerror = function (e) {
+                    console.error("Error opening IndexedDB:", e.target.error);
+                });
+            var defaultBanner = document.querySelector(".hero-image.has-image").style.backgroundImage;
+            function setBgImage(e) {
+                setImage(document.body, e, defaultBg), localStorage.setItem("bgImage", e);
+            }
+
+   function setImage(e, t, o) {
+    var n = new Image();
+    
+    // Handle image loading and background setting
+    n.onload = function () {
+        // Set background properties
+        e.style.backgroundImage = 'url("' + t + '")';
+        e.style.backgroundSize = "cover";  // Ensures the image covers the element
+        e.style.backgroundRepeat = "no-repeat";  // Prevents repetition of the image
+        e.style.backgroundPosition = "center center";  // Keeps the image centered
+        e.style.backgroundAttachment = "scroll";  // Adjusts background scrolling on page
+        
+        // Enable flexbox for centering content inside the container
+        e.style.display = "flex";
+        e.style.justifyContent = "center";  // Horizontally centers content
+        e.style.alignItems = "center";  // Vertically centers content
+        e.style.flexDirection = "column";  // You can adjust this depending on the content's layout
+    };
+    
+    // Fallback if the image doesn't load (error handling)
+    n.onerror = function () {
+        e.style.backgroundImage = o;  // Fallback to a default image if the main image fails
+    };
+    
+    n.src = t;  // Set the image source URL
+}
+
+            function retrieveStoredImages() {
+                var e = localStorage.getItem("bannerImage"),
+                    t = localStorage.getItem("bgImage");
+                e && setBannerImage(e), t && setBgImage(t);
+            }
+            function bet(e) {
+                var t = parseInt(document.getElementById("betAmountInput").value),
+                    o = credits > 1e5 ? Math.ceil(0.35 * credits) : Math.ceil(0.07 * credits);
+                if (t < o) alert("Minimum bet amount is " + o + " credits.");
+                else {
+                    if (deductCredits(t))
+                        if (Math.random() < winPercentage) {
+                            var n = 2 * t;
+                            (credits += n), showMessage("💘Congrats! You won " + n + " credits!", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits);
+                        } else showMessage("You lost, try again.👍", "bg-message");
+                    else showMessage("Insufficient credits 💰", "bg-message");
+                    setMinimumBetAmount();
+                }
+            }
+            function deductCredits(e) {
+                return credits >= e && ((credits -= e), !0);
+            }
+            function setMinimumBetAmount() {
+                var e = credits > 1e5 ? Math.ceil(0.5 * credits) : Math.ceil(0.07 * credits),
+                    t = document.getElementById("betAmountInput");
+                (t.placeholder = "Minimum bet: " + e), (t.min = e), (t.style.backgroundColor = "#00bfff");
+            }
+            function todCredits() {
+                var e = Math.floor(50 * Math.random()) + 1;
+                (credits += e), showMessage("You borrowed " + e + "💎 credits.", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits);
+            }
+            function giveToPoor() {
+                var e = Math.ceil(0.15 * credits);
+                deductCredits(e)
+                    ? (showMessage("You gave " + e + "💎 credits to the poor.", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits))
+                    : showMessage("Insufficient credits to give to the poor.", "bg-message");
+            }
+            function displayRandomNumber() {
+                (currentNumber = Math.floor(50 * Math.random()) + 1), (document.getElementById("bingoNumberDisplay").textContent = "Next number: " + currentNumber), setTimeout(displayRandomNumber, 5e3);
+            }
+            function datePartner() {
+                var e = Math.random() < 0.4,
+                    t = Math.ceil(0.2 * credits);
+                e
+                    ? ((credits += t), showMessage("You gained " + t + "💎 credits from dating a partner.", "bg-message"))
+                    : deductCredits(t)
+                    ? showMessage("You lost " + t + "💎 credits from dating a partner.", "bg-message")
+                    : showMessage("Insufficient credits for dating a partner.", "bg-message"),
+                    updateAchievementsAndTitles(credits),
+                    localStorage.setItem("credits", credits);
+            }
+            function updateTitles(e) {
+                var t = [
+                    { threshold: 255e4, title: "Superstar" },
+                    { threshold: 155e4, title: "Prodigy" },
+                    { threshold: 105e4, title: "Hero" },
+                    { threshold: 75e4, title: "Sensei" },
+                    { threshold: 65e4, title: "Master" },
+                    { threshold: 55e4, title: "Otaku" },
+                    { threshold: 45e4, title: "Nerd" },
+                    { threshold: 35e4, title: "Geek" },
+                    { threshold: 25e4, title: "Scholar" },
+                    { threshold: 15e4, title: "Guru" },
+                    { threshold: 1e5, title: "Expert" },
+                    { threshold: 9e4, title: "Connoisseur" },
+                    { threshold: 8e4, title: "Superfan" },
+                    { threshold: 7e4, title: "Devotee II" },
+                    { threshold: 6e4, title: "Enthusiast II" },
+                    { threshold: 5e4, title: "Devotee" },
+                    { threshold: 4e4, title: "Aficionado" },
+                    { threshold: 3e4, title: "Fanatic" },
+                    { threshold: 25e3, title: "Apprentice" },
+                    { threshold: 15e3, title: "Enthusiast" },
+                    { threshold: 1e4, title: "Novice" },
+                    { threshold: 8e3, title: "Amateur" },
+                    { threshold: 6e3, title: "Rookie" },
+                    { threshold: 4e3, title: "Fan" },
+                    { threshold: 2e3, title: "Fun" },
+                    { threshold: 100, title: "Casual" },
+                ].filter(function (t) {
+                    return e >= t.threshold;
+                });
+                t.sort(function (e, t) {
+                    return t.threshold - e.threshold;
+                }),
+                    updateSubmenu("titleSubmenu", t, "title");
+            }
+            function prevSlide() {
+                currentSlideIndex = (currentSlideIndex - 1 + slideshowImages.length) % slideshowImages.length;
+                var e = document.getElementById("fullscreenImage");
+                e.classList.remove("active"),
+                    setTimeout(function () {
+                        (e.src = slideshowImages[currentSlideIndex]), e.classList.add("active");
+                    }, 500);
+            }
+            function updateAchievements(e) {
+                var t = [
+                    { threshold: 100, name: "Anime Novice" },
+                    { threshold: 500, name: "Cosplay Apprentice" },
+                    { threshold: 2500, name: "Anime Watcher" },
+                    { threshold: 5e3, name: "Anime Reviewer" },
+                    { threshold: 1e4, name: "Manga Critic" },
+                    { threshold: 2e4, name: "Trivia Buff" },
+                    { threshold: 3e4, name: "Completionist" },
+                    { threshold: 4e4, name: "Analysis Expert" },
+                    { threshold: 5e4, name: "Marathon Champion" },
+                    { threshold: 6e4, name: "Encyclopedia Holder" },
+                    { threshold: 75e3, name: "Fiction Fanatic" },
+                    { threshold: 1e5, name: "Otaku Philosopher" },
+                    { threshold: 25e4, name: "Merch Master" },
+                    { threshold: 35e4, name: "Romance Royalty" },
+                    { threshold: 55e4, name: "Aficionado" },
+                    { threshold: 65e4, name: "Dungeon Delver" },
+                    { threshold: 75e4, name: "History Buff" },
+                    { threshold: 105e4, name: "Comedy Connoisseur" },
+                    { threshold: 125e4, name: "Anime Archaeologist" },
+                    { threshold: 205e4, name: "Thriller Pro" },
+                    { threshold: 255e4, name: "Gaming Guru" },
+                    { threshold: 355e4, name: "Sci-Fi Specialist" },
+                    { threshold: 455e4, name: "Anime Traveler" },
+                    { threshold: 555e4, name: "Anime Podcast Pro" },
+                    { threshold: 655e4, name: "Legendary Anime Master" },
+                    { threshold: 755e4, name: "Emperor" },
+                ].filter(function (t) {
+                    return e >= t.threshold;
+                });
+                t.sort(function (e, t) {
+                    return t.threshold - e.threshold;
+                }),
+                    updateSubmenu("achievementsSubmenu", t, "name");
+            }
+            function updateSubmenu(e, t, o) {
+                var n = document.getElementById(e);
+                (n.innerHTML = ""),
+                    t.slice(0, Math.min(4, t.length)).forEach(function (e) {
+                        var t = document.createElement("li"),
+                            r = document.createElement("a");
+                        (r.href = "javascript:void(0)"), (r.textContent = e[o]), t.appendChild(r), n.appendChild(t);
+                    });
+            }
+            function showCredits() {
+                showMessage("You have " + credits + "💎 credits.", "bg-message");
+            }
+            function closeMenu() {
+                var e = document.querySelector(".menu");
+                (e.style.transition = "opacity 7s"),
+                    (e.style.opacity = 0),
+                    setTimeout(function () {
+                        e.style.display = "none";
+                    }, 5e3);
+            }
+            function startBingo() {
+                var e = document.getElementById("bingo-board");
+                if (bingoBoardVisible) (e.style.display = "none"), (bingoBoardVisible = !1);
+                else {
+                    (e.style.display = "block"), (bingoBoardVisible = !0);
+                    var t = document.getElementById("bingoGrid");
+                    (t.innerHTML = ""),
+                        generateRandomNumbers(1, 50, 25).forEach(function (e) {
+                            var o = document.createElement("div");
+                            (o.className = "bingo-cell"),
+                                (o.textContent = e),
+                                o.setAttribute("data-clicked", "false"),
+                                (o.onclick = function () {
+                                    o.textContent == currentNumber && "false" === o.getAttribute("data-clicked") && (o.classList.add("selected"), o.setAttribute("data-clicked", "true"), checkBingo());
+                                }),
+                                t.appendChild(o);
+                        }),
+                        displayRandomNumber();
+                }
+            }
+            function loadImagesFromDB() {
+                var e = db.transaction(["images"], "readonly").objectStore("images").openCursor(null, "prev");
+                (e.onsuccess = function (e) {
+                    var t = e.target.result;
+                    if (t) {
+                        var o = t.value.url,
+                            n = document.getElementById("imageGallery"),
+                            r = document.createElement("div");
+                        r.className = "gallery-item";
+                        var a = document.createElement("img");
+                        (a.src = o),
+                            (a.alt = "Image"),
+                            (a.onclick = function () {
+                                openFullscreenSlideshow(o);
+                            }),
+                            r.appendChild(a);
+                        var s = document.createElement("span");
+                        (s.innerHTML = "&times;"),
+                            (s.className = "delete-btn"),
+                            (s.onclick = function () {
+                                n.removeChild(r), deleteImageFromDB(o);
+                            }),
+                            r.appendChild(s),
+                            n.appendChild(r),
+                            t.continue();
+                    }
+                }),
+                    (e.onerror = function (t) {
+                        console.error("Error loading images from IndexedDB:", e.error);
+                    });
+            }
+            function generateRandomNumbers(e, t, o) {
+                for (var n = []; n.length < o; ) {
+                    var r = Math.floor(Math.random() * (t - e + 1)) + e;
+                    n.includes(r) || n.push(r);
+                }
+                return n;
+            }
+            function checkBingo() {
+                for (var e = document.querySelectorAll(".bingo-cell"), t = [], o = 0; o < 25; o += 5)
+                    t.push(
+                        Array.from(e)
+                            .slice(o, o + 5)
+                            .map((e) => e.classList.contains("selected"))
+                    );
+                var n = t.some((e) => e.every((e) => e)),
+                    r = t[0].some((e, o) => t.every((e) => e[o])),
+                    a = t.every((e, t) => e[t]),
+                    s = t.every((e, t) => e[4 - t]);
+                (n || r || a || s) &&
+                    ((credits += 200),
+                    showMessage("Congrats! Bingo boost enabled. You've earned 200💎 credits", "bg-message"),
+                    updateAchievementsAndTitles(credits),
+                    localStorage.setItem("credits", credits),
+                    document.querySelectorAll(".bingo-cell").forEach((e) => {
+                        e.onclick = function () {
+                            e.textContent == currentNumber && "false" === e.getAttribute("data-clicked") && (e.classList.add("selected"), e.setAttribute("data-clicked", "true"), checkBingoWithBoost());
+                        };
+                    }));
+            }
+            function openGallery() {
+                document.getElementById("galleryOverlay").style.display = "flex";
+            }
+            function applyColors() {
+                var e = document.getElementById("backgroundColorInput").value,
+                    t = document.getElementById("fontColorInput").value,
+                    o = document.getElementById("hoverColorInput").value;
+                localStorage.setItem("backgroundColor", e), localStorage.setItem("fontColor", t), localStorage.setItem("hoverColor", o), applyStoredColors();
+            }
+            function checkBingoWithBoost() {
+                for (var e = document.querySelectorAll(".bingo-cell"), t = [], o = 0; o < 25; o += 5)
+                    t.push(
+                        Array.from(e)
+                            .slice(o, o + 5)
+                            .map((e) => e.classList.contains("selected"))
+                    );
+                var n = t.some((e) => e.every((e) => e)),
+                    r = t[0].some((e, o) => t.every((e) => e[o])),
+                    a = t.every((e, t) => e[t]),
+                    s = t.every((e, t) => e[4 - t]);
+                (n || r || a || s) && ((credits += 300), showMessage("Congrats! You've earned 300💎 bingo bonus", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits)),
+                    Array.from(e).every((e) => e.classList.contains("selected")) &&
+                        ((credits += 1e3), showMessage("Bingo Champ! You've earned 1000💎 Master Bonus!", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits));
+            }
+            function updateAchievementsAndTitles(e) {
+                updateTitles(e), updateAchievements(e);
+            }
+            function toggleColorBoard() {
+                var e = document.getElementById("colorBoard");
+                e.style.display = "block" === e.style.display ? "none" : "block";
+            }
+            function applyStoredColors() {
+                var e = localStorage.getItem("backgroundColor") || "#000000",
+                    t = localStorage.getItem("fontColor") || "#C0C0C0",
+                    o = localStorage.getItem("hoverColor") || "#36454F";
+                document.querySelectorAll(".menu, .submenu, .message, #logic-board, #music-board, #bingo-board, .color-board").forEach(function (o) {
+                    (o.style.backgroundColor = e), (o.style.color = t);
+                }),
+                    document.querySelectorAll(".menu li").forEach(function (t) {
+                        t.addEventListener("mouseenter", function () {
+                            this.style.backgroundColor = o;
+                        }),
+                            t.addEventListener("mouseleave", function () {
+                                this.style.backgroundColor = e;
+                            });
+                    }),
+                    document.querySelectorAll(".menu a, .submenu a, .message, #logic-board, #music-board, #bingo-board, .color-board").forEach(function (e) {
+                        e.style.color = t;
+                    }),
+                    (document.getElementById("backgroundColorInput").value = e),
+                    (document.getElementById("fontColorInput").value = t),
+                    (document.getElementById("hoverColorInput").value = o);
+            }
+            function reset() {
+                localStorage.removeItem("bannerImage"),
+                    localStorage.removeItem("bgImage"),
+                    localStorage.removeItem("backgroundColor"),
+                    localStorage.removeItem("fontColor"),
+                    localStorage.removeItem("hoverColor"),
+                    (document.body.style.backgroundImage = defaultBg),
+                    (document.querySelector(".hero-image.has-image").style.backgroundImage = defaultBanner),
+                    applyStoredColors();
+            }
+            function closeGallery() {
+                document.getElementById("galleryOverlay").style.display = "none";
+            }
+            function openFullscreenSlideshow(e) {
+                var t = document.getElementById("fullscreenImage");
+                (t.src = e),
+                    (document.getElementById("fullscreenSlideshow").style.display = "flex"),
+                    (slideshowImages = Array.from(document.querySelectorAll(".gallery-item img")).map((e) => e.src)),
+                    (currentSlideIndex = slideshowImages.indexOf(e)),
+                    (t.style.transform = "scale(1)"),
+                    (t.style.opacity = "1"),
+                    t.addEventListener("mouseenter", function () {
+                        this.style.transform = "scale(1.7)";
+                    }),
+                    t.addEventListener("mouseleave", function () {
+                        this.style.transform = "scale(1)";
+                    });
+            }
+            function closeFullscreenSlideshow() {
+                document.getElementById("fullscreenImage").classList.remove("active"),
+                    setTimeout(function () {
+                        document.getElementById("fullscreenSlideshow").style.display = "none";
+                    }, 500);
+            }
+            window.onload = function () {
+                applyStoredColors();
+            };
+        </script>
+
+
+
+
