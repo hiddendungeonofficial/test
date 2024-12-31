@@ -1,996 +1,520 @@
-<style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            .menu {
-                display: flex;
-                flex-wrap: wrap;
-                background-color: #000;
-                justify-content: center;
-                align-items: center;
-                list-style-type: none;
-                padding: 0;
-                margin: 0;
-                max-width: 100%;
-                border-radius: 4px;
-            }
-            .menu li {
-                position: relative;
-                text-align: center;
-                padding: 6px 16px;
-                border-right: 1px solid #ccc;
-                flex: 1 0 auto;
-                max-width: 170px;
-                font-size: 16px;
-                height: 14px;
-            }
-            .menu li:last-child {
-                border-right: none;
-            }
-            .menu a,
-            .submenu a {
-                display: block;
-                color: silver;
-                text-decoration: none;
-            }
-            .submenu {
-                display: none;
-                position: absolute;
-                background-color: #000;
-                top: 100%;
-                left: 0;
-                width: 170px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                z-index: 1;
-                text-align: right;
-            }
-            .submenu li {
-                font-size: 14px;
-            }
-            .menu li:hover > .submenu {
-                display: block;
-            }
-            .menu li:hover {
-                background-color: #36454f;
-            }
-            .message {
-                display: none;
-                color: silver;
-                border-radius: 4px;
-                position: relative;
-                margin: 5px auto;
-                text-align: center;
-                font-size: 16px;
-                width: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 50px;
-            }
-            .message.bg-message {
-                background-color: #000;
-            }
-            
-            @media only screen and (max-width: 768px) {
-                .menu li {
-                    flex: 1 0 100%;
-                    border-right: none;
-                    border-bottom: 1px solid #ccc;
-                }
-                .menu li:last-child {
-                    border-bottom: none;
-                }
-            }
-            #logic-board,
-            #music-board {
-                display: none;
-                background-color: #36454f;
-                padding: 20px;
-                border-radius: 10px;
-                width: 300px;
-                margin: 20px auto;
-                text-align: center;
-                color: silver;
-            }
-            #logic-board input,
-            #music-board input {
-                background-color: #000;
-                color: silver;
-                font-size: 14px;
-                border: 1px solid silver;
-                padding: 5px;
-                border-radius: 5px;
-                margin-top: 10px;
-            }
-            .music-controls {
-                margin-top: 10px;
-            }
-            .music-controls span {
-                cursor: pointer;
-                font-size: 14px;
-                margin: 0 10px;
-            }
-            #bingo-board {
-                display: none;
-                background-color: #36454f;
-                padding: 20px;
-                border-radius: 10px;
-                width: 300px;
-                margin: 20px auto;
-                text-align: center;
-                color: silver;
-            }
-            .bingo-grid {
-                display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                grid-gap: 5px;
-            }
-            .bingo-cell {
-                background-color: #000;
-                color: silver;
-                border-radius: 5px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 50px;
-                font-size: 18px;
-                cursor: pointer;
-            }
-            .bingo-cell.selected {
-                background-color: #36454f;
-            }
-            .custom-button,
-            .playlist-button {
-                background-color: #000;
-                color: silver;
-                font-size: 12px;
-                border: none;
-                padding: 8px 14px;
-                cursor: pointer;
-            }
-            .color-board {
-                display: none;
-                background-color: #36454f;
-                padding: 20px;
-                border-radius: 10px;
-                width: 300px;
-                margin: 20px auto;
-                text-align: center;
-                color: silver;
-            }
-            .color-board input {
-                background-color: #000;
-                color: silver;
-                font-size: 14px;
-                border: 1px solid silver;
-                padding: 5px;
-                border-radius: 5px;
-                margin-top: 10px;
-            }
-            .post-outer-container {
-                background-color: rgba(0, 0, 0, 0.52);
-            }
-            .overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.8);
-                z-index: 2;
-                overflow-x: hidden;
-                transition: 0.5s ease;
-                padding-top: 60px;
-            }
-            .overlay-content::-webkit-scrollbar-track {
-                background: #000;
-            }
-            .overlay-content::-webkit-scrollbar-thumb {
-                background-color: #000;
-                border-radius: 4px;
-            }
-            .overlay a.closebtn {
-                position: absolute;
-                top: 25px;
-                right: 20px;
-                font-size: 36px;
-                color: red;
-                text-decoration: none;
-            }
-            .input-container {
-                margin-top: 20px;
-                width: 100%;
-                max-width: 100%;
-                padding: 10px;
-                box-sizing: border-box;
-                background-color: #333;
-            }
-            .input-container input[type="text"] {
-                width: 70%;
-                padding: 8px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                font-size: 11px;
-                margin-right: 10px;
-                background-color: #fff;
-                color: #333;
-            }
-            .input-container input[type="submit"] {
-                padding: 8px 16px;
-                background-color: #000;
-                color: #fff;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 11px;
-            }
-            .gallery {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-around;
-                align-items: center;
-                margin-top: 10px;
-            }
-            .gallery .gallery-item {
-                position: relative;
-                margin: 10px;
-                width: calc(25% - 20px);
-                cursor: pointer;
-            }
-            .gallery .gallery-item img {
-                max-width: 100%;
-                height: auto;
-                border-radius: 4px;
-                box-sizing: border-box;
-                display: block;
-                border: 6px solid #fff;
-                transition: transform 0.5s ease, opacity 0.5s ease;
-            }
-            .gallery .gallery-item img:hover {
-                transform: scale(1.15);
-            }
-            .gallery .gallery-item .delete-btn {
-                position: absolute;
-                top: 5px;
-                right: 5px;
-                font-size: 20px;
-                color: #fff;
-                width: 25px;
-                height: 25px;
-                line-height: 25px;
-                text-align: center;
-                cursor: pointer;
-                border-radius: 50%;
-                z-index: 10;
-            }
-            .fullscreen-slideshow {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.8);
-                z-index: 3;
-                text-align: center;
-                overflow: hidden;
-            }
-            .fullscreen-slideshow img {
-                max-width: 100%;
-                max-height: 100%;
-                margin: auto;
-                display: block;
-                transform: scale(0.9);
-                opacity: 0.1;
-                transition: transform 5s ease, opacity 5s ease;
-            }
-            .fullscreen-slideshow img.active {
-                transform: scale(1);
-                opacity: 1;
-            }
-            .fullscreen-slideshow .closebtn {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                font-size: 36px;
-                color: #fff;
-                text-decoration: none;
-                z-index: 4;
-                cursor: pointer;
-            }
-            .slideshow-navigation {
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                z-index: 4;
-            }
-            .slideshow-navigation button {
-                background: rgba(0, 0, 0, 0.5);
-                color: #fff;
-                border: none;
-                font-size: 24px;
-                cursor: pointer;
-                padding: 10px 20px;
-                outline: 0;
-            }
-            .slideshow-navigation button:hover {
-                background: rgba(0, 0, 0, 0.7);
-            }
-            .fullscreen-slideshow img {
-                max-width: 100%;
-                max-height: 100%;
-                margin: auto;
-                display: block;
-                transform: scale(1);
-                opacity: 1;
-                transition: transform 4s ease, opacity 0.5s ease;
-            }
-        </style>
-    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Badge Leveling System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    
-        <ul class="menu">
-            <li>
-                <a href="javascript:void(0)">Preferences</a>
-                <ul class="submenu">
-                    <li><a href="javascript:void(0)" onclick="toggleMusicBoard()">Play Music</a></li>
-                    <li><a href="javascript:void(0)" onclick="openGallery()">Gallery</a></li>
-                    <li><a href="javascript:void(0)" onclick="toggleColorBoard()">Colors</a></li>
-                    <li><a href="javascript:void(0)" onclick="reset()">Reset</a></li>
-                    <li><a href="javascript:void(0)" onclick="closeMenu()">Close Menu</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:void(0)">Lucky Credits</a>
-                <ul class="submenu">
-                    <li><input type="number" id="betAmountInput" placeholder="" /></li>
-                    <li><a href="javascript:void(0)" onclick='bet("coin flip")'>Coin Flip</a></li>
-                    <li><a href="javascript:void(0)" onclick='bet("dice roll")'>Dice Roll</a></li>
-                    <li><a href="javascript:void(0)" onclick="lottery()">Lottery</a></li>
-                    <li>
-                        <a href="javascript:void(0)" onclick="showCredits()">My Credits💎</a>
-                        <ul class="submenu" id="creditsSubmenu"></ul>
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:void(0)">Hits</a>
-                <ul class="submenu">
-                    
-                    <li><a href="javascript:void(0)" onclick="giveToPoor()">Give to Poor</a></li>
-                    <li><a href="javascript:void(0)" onclick="datePartner()">Date a Partner👫</a></li>
-                    <li><a href="javascript:void(0)" onclick="showLogicBoard()">My Logic</a></li>
-                    <li><a href="javascript:void(0)" onclick="startBingo()">Bingo</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:void(0)">Masteries🏆</a>
-                <ul class="submenu" id="achievementsSubmenu"></ul>
-            </li>
-            <li>
-                <a href="javascript:void(0)">Titles🎖️</a>
-                <ul class="submenu" id="titleSubmenu">
-                    <li><a href="javascript:void(0)">No Title</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:void(0)">Profile BG</a>
-                <ul class="submenu">
-                    <li><a href="javascript:void(0)" onclick='setBgImage("https://i.ibb.co/5hSn5yc/1.jpg")'>Default 1</a></li>
-                    <li><a href="javascript:void(0)" onclick='setBgImage("https://i.ibb.co/f0b2cr9/2.jpg")'>Default 2</a></li>
-                    <li><a href="javascript:void(0)" onclick='setBgImage(prompt("Enter the URL of the background image:"))'>Upload</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="javascript:void(0)">Profile Cover</a>
-                <ul class="submenu">
-                    <li><a href="javascript:void(0)" onclick='setBannerImage("https://i.ibb.co/FKH7NRd/my-banner-1.png")'>Default 1</a></li>
-                    <li>
-                        <a href="javascript:void(0)" onclick='setBannerImage("https://i.ibb.co/DGbybzz/my-banner.png")'>
-                            Default 2
-                        </a>
-                    </li>
-                    <li><a href="javascript:void(0)" onclick='setBannerImage(prompt("Enter the URL of your custom banner image:"))'>Upload </a></li>
-                </ul>
-            </li>
-            
-        </ul>
-        <div class="message bg-message" id="message"></div>
-        <div id="logic-board">
-            <div id="sequence"></div>
-            <input type="number" id="answerInput" placeholder="Enter your answer" /><button onclick="checkAnswer()" style="background-color: #000; color: silver; font-size: 14px;">Submit</button>
-        </div>
-        <div id="music-board">
-            <input type="text" id="musicUrlInput" placeholder="YouTube or sound cloud" /><button onclick="loadMusic()" style="background-color: #000; color: silver; font-size: 14px;">Playlist url❤️</button>
-            <div class="music-controls"><span onclick="stopMusic()">&#9632;</span></div>
-            <div id="musicPlayerContainer"></div>
-        </div>
-        <div id="bingo-board">
-            <div class="bingo-grid" id="bingoGrid"></div>
-            <div id="bingoNumberDisplay" style="color: silver; font-size: 20px; margin-top: 10px;"></div>
-        </div>
-        <div class="color-board" id="colorBoard">
-            <input type="color" id="backgroundColorInput" value="#000000" /><br />
-            <label for="backgroundColorInput" style="font-size: 14px;">"Background Color"</label><br />
-            <input type="color" id="fontColorInput" value="#C0C0C0" /><br />
-            <label for="fontColorInput" style="font-size: 14px;">"Font Color"</label><br />
-            <input type="color" id="hoverColorInput" value="#36454F" /><br />
-            <label for="hoverColorInput" style="font-size: 14px;">"Hover Color"</label><br />
-            <button class="custom-button" onclick="applyColors()">Apply Colors</button>
-        </div>
-        
-        <div id="galleryOverlay" class="overlay">
-            <div class="overlay-content">
-                <a href="javascript:void(0)" class="closebtn" onclick="closeGallery()">&times;</a>
-                <h1>My Gallery</h1>
-                <div class="input-container"><input type="text" id="imageUrl" placeholder="Enter Image URL" /> <input type="submit" value="Add Image" onclick="addImage()" /></div>
-                <div class="gallery" id="imageGallery"></div>
-            </div>
-        </div>
-        <div id="fullscreenSlideshow" class="fullscreen-slideshow">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeFullscreenSlideshow()">&times;</a>
-            <div class="slideshow-navigation"><button onclick="prevSlide()">&lt; Prev</button><button onclick="nextSlide()">Next &gt;</button></div>
-            <img id="fullscreenImage" />
-        </div>
-        <script>
-            function toggleMusicBoard() {
-                var e = document.getElementById("music-board");
-                "none" === e.style.display || "" === e.style.display ? (e.style.display = "block") : (e.style.display = "none");
-            }
-            function loadMusic() {
-                var e = document.getElementById("musicUrlInput").value,
-                    t = document.getElementById("musicPlayerContainer"),
-                    o = "";
-                if (e.includes("soundcloud.com")) o = "https://w.soundcloud.com/player/?url=" + encodeURIComponent(e);
-                else {
-                    if (!e.includes("youtube.com") && !e.includes("youtu.be")) return void alert("Unsupported URL");
-                    o = "https://www.youtube.com/embed/" + (e.split("v=")[1] || e.split("/").pop());
-                }
-                t.innerHTML = '<iframe width="100%" height="300" src="' + o + '" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
-            }
-            function playMusic() {
-                var e = document.querySelector("#musicPlayerContainer iframe");
-                if (e) {
-                    var t = e.src;
-                    e.src = t + "&autoplay=1";
-                }
-            }
-            function stopMusic() {
-                var e = document.querySelector("#musicPlayerContainer iframe");
-                if (e) {
-                    var t = e.src.split("&autoplay=1")[0];
-                    e.src = t;
-                }
-            }
-         
-            var  
-                defaultBg = document.body.style.backgroundImage,
-                credits = parseInt(localStorage.getItem("credits")) || 0,
-                lastLotteryTime = 0,
-                winPercentage = 0.4,
-                sequence = [],
-                currentAnswer = 0,
-                isMissingNumberQuestion = !1,
-                currentNumber = null,
-                bingoBoardVisible = !1;
-            document.addEventListener("DOMContentLoaded", function () {
-                welcomeUser(), updateAchievementsAndTitles(credits), retrieveStoredImages();
-            });
-            var db,
-                dbPromise = window.indexedDB.open("imageGalleryDB", 1),
-                slideshowImages = [],
-                currentSlideIndex = 0;
-            function welcomeUser() {
-               showMessage("Welcome to the Hidden Dungeon! " + getRandomElement([
-    "Don't worry, the monsters are friendly... for now! 🐉", 
-    "Watch out for traps... but only the ones with cookies 🍪!", 
-    "Grab your sword (or snack) and dive in! ⚔️", 
-    "Hope you brought your map... or just wander around like us! 🧭", 
-    "The dungeon is dark, but the vibes are lit! 💀✨", 
-    "We don't judge you for getting lost. We’re all lost here! 🤷‍♂️", 
-    "Shh... the treasure chest is just behind you... or maybe it’s a mimic! 🏆💀", 
-    "Ready to fight dragons, make friends, and maybe grab some loot? 🐲💎"
-]), "bg-message");
-            }
-            function getRandomElement(e) {
-                return e[Math.floor(Math.random() * e.length)];
-            }
-            function lottery() {
-                var e = Date.now(),
-                    t = e - lastLotteryTime,
-                    o = Math.ceil((6e5 - t) / 6e4);
-                if (t >= 6e5) {
-                    var n = Math.floor(100 * Math.random()) + 30;
-                    (credits += n), showMessage("💘Congrats! You gained " + n + "💎 credits!", "bg-message"), (lastLotteryTime = e), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits);
-                } else alert("Please wait " + o + " minute(s) before trying the lottery again.");
-            }
-            function addImage() {
-                var e = document.getElementById("imageUrl").value.trim();
-                if ("" !== e) {
-                    var t = db.transaction(["images"], "readwrite").objectStore("images").add({ url: e });
-                    (t.onsuccess = function (t) {
-                        var o = document.getElementById("imageGallery"),
-                            n = document.createElement("div");
-                        n.className = "gallery-item";
-                        var r = document.createElement("img");
-                        (r.src = e),
-                            (r.alt = "Image"),
-                            (r.onclick = function () {
-                                openFullscreenSlideshow(e);
-                            }),
-                            n.appendChild(r);
-                        var a = document.createElement("span");
-                        (a.innerHTML = "&times;"),
-                            (a.className = "delete-btn"),
-                            (a.onclick = function () {
-                                o.removeChild(n), deleteImageFromDB(e);
-                            }),
-                            n.appendChild(a),
-                            o.prepend(n),
-                            (document.getElementById("imageUrl").value = "");
-                    }),
-                        (t.onerror = function (e) {
-                            console.error("Error adding image URL to IndexedDB:", t.error);
-                        });
-                }
-            }
-            function nextSlide() {
-                currentSlideIndex = (currentSlideIndex + 1) % slideshowImages.length;
-                var e = document.getElementById("fullscreenImage");
-                e.classList.remove("active"),
-                    setTimeout(function () {
-                        (e.src = slideshowImages[currentSlideIndex]), e.classList.add("active");
-                    }, 500);
-            }
-            function showMessage(e, t) {
-                var o = document.getElementById("message");
-                (o.textContent = e),
-                    (o.className = "message " + t),
-                    (o.style.display = "block"),
-                    setTimeout(function () {
-                        o.style.display = "none";
-                    }, 7e3);
-            }
-            function showLogicBoard() {
-                var e = document.getElementById("logic-board");
-                (e.style.display = "block" === e.style.display ? "none" : "block"), "block" === e.style.display && generateQuestion();
-            }
-            function generateQuestion() {
-                generateSequence(Math.random() < 0.5 ? "next" : "missing");
-            }
-            function generateSequence(e) {
-                sequence = [];
-                var t = Math.floor(10 * Math.random()) + 1;
-                if (0 === (e = Math.floor(3 * Math.random()))) {
-                    for (var o = Math.floor(10 * Math.random()) + 2, n = 0; n < 5; n++) sequence.push(t + n * o);
-                    currentAnswer = t + 5 * o;
-                } else if (1 === e) {
-                    var r = Math.floor(3 * Math.random()) + 2;
-                    for (n = 0; n < 5; n++) sequence.push(t * Math.pow(r, n));
-                    currentAnswer = t * Math.pow(r, 5);
-                } else {
-                    var a = Math.floor(5 * Math.random()) + 1,
-                        s = Math.floor(5 * Math.random()) + 1;
-                    for (n = 0; n < 5; n++) sequence.push(a * n * n + s * n + t);
-                    currentAnswer = 5 * a * 5 + 5 * s + t;
-                }
-                if (0 === e || 1 === e) (isMissingNumberQuestion = !1), (document.getElementById("sequence").textContent = "Find the next number: " + sequence.join(", "));
-                else {
-                    var l = Math.floor(5 * Math.random());
-                    (currentAnswer = sequence[l]), (sequence[l] = "?"), (isMissingNumberQuestion = !0), (document.getElementById("sequence").textContent = "Find the missing number: " + sequence.join(", "));
-                }
-            }
-            function checkAnswer() {
-                parseInt(document.getElementById("answerInput").value) === currentAnswer
-                    ? ((credits += 75), showMessage("Correct🎯! You earned 75💎 credits.", "bg-message"))
-                    : showMessage("Incorrect.🎯 The correct answer was " + currentAnswer + ".", "bg-message"),
-                    updateAchievementsAndTitles(credits),
-                    localStorage.setItem("credits", credits),
-                    (document.getElementById("answerInput").value = ""),
-                    generateQuestion();
-            }
-            function deleteImageFromDB(e) {
-                var t = db.transaction(["images"], "readwrite").objectStore("images").openCursor();
-                (t.onsuccess = function (t) {
-                    var o = t.target.result;
-                    if (o) {
-                        if (o.value.url === e) {
-                            var n = o.delete();
-                            (n.onsuccess = function () {
-                                console.log("Image URL deleted successfully from IndexedDB");
-                            }),
-                                (n.onerror = function () {
-                                    console.error("Error deleting image URL from IndexedDB:", n.error);
-                                });
-                            o.value;
-                            for (var r = document.getElementById("imageGallery"), a = r.getElementsByClassName("gallery-item"), s = 0; s < a.length; s++) {
-                                if (a[s].getElementsByTagName("img")[0].src === e) {
-                                    r.removeChild(a[s]);
-                                    break;
-                                }
-                            }
-                        }
-                        o.continue();
-                    } else console.warn("Image URL not found in IndexedDB");
-                }),
-                    (t.onerror = function (e) {
-                        console.error("Error opening cursor for deleting image URL from IndexedDB:", t.error);
-                    });
-            }
-           
-            function setBannerImage(e) {
-                setImage(document.querySelector(".hero-image.has-image"), e, defaultBanner), localStorage.setItem("bannerImage", e);
-            }
-            (dbPromise.onupgradeneeded = function (e) {
-                (db = e.target.result).objectStoreNames.contains("images") || db.createObjectStore("images", { keyPath: "id", autoIncrement: !0 });
-            }),
-                (dbPromise.onsuccess = function (e) {
-                    (db = e.target.result), loadImagesFromDB();
-                }),
-                (dbPromise.onerror = function (e) {
-                    console.error("Error opening IndexedDB:", e.target.error);
-                });
-            var defaultBanner = document.querySelector(".hero-image.has-image").style.backgroundImage;
-            function setBgImage(e) {
-                setImage(document.body, e, defaultBg), localStorage.setItem("bgImage", e);
-            }
-
-   function setImage(e, t, o) {
-    var n = new Image();
-    
-    // Handle image loading and background setting
-    n.onload = function () {
-        // Set background properties
-        e.style.backgroundImage = 'url("' + t + '")';
-        e.style.backgroundSize = "cover";  // Ensures the image covers the element
-        e.style.backgroundRepeat = "no-repeat";  // Prevents repetition of the image
-        e.style.backgroundPosition = "center center";  // Keeps the image centered
-        e.style.backgroundAttachment = "scroll";  // Adjusts background scrolling on page
-        
-        // Enable flexbox for centering content inside the container
-        e.style.display = "flex";
-        e.style.justifyContent = "center";  // Horizontally centers content
-        e.style.alignItems = "center";  // Vertically centers content
-        e.style.flexDirection = "column";  // You can adjust this depending on the content's layout
-    };
-    
-    // Fallback if the image doesn't load (error handling)
-    n.onerror = function () {
-        e.style.backgroundImage = o;  // Fallback to a default image if the main image fails
-    };
-    
-    n.src = t;  // Set the image source URL
+	<style>
+ 	@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+.body_badge {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #121212; /* Fallback black background */
+    background-image: url('https://i.ibb.co/9rd5T1r/Hidden-dungeon-2.png');
+    background-size: cover; /* Ensures the image covers the entire background */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents tiling */
+    background-attachment: fixed; /* Keeps the background fixed when scrolling */
 }
 
-            function retrieveStoredImages() {
-                var e = localStorage.getItem("bannerImage"),
-                    t = localStorage.getItem("bgImage");
-                e && setBannerImage(e), t && setBgImage(t);
-            }
-            function bet(e) {
-                var t = parseInt(document.getElementById("betAmountInput").value),
-                    o = credits > 1e5 ? Math.ceil(0.35 * credits) : Math.ceil(0.07 * credits);
-                if (t < o) alert("Minimum bet amount is " + o + " credits.");
-                else {
-                    if (deductCredits(t))
-                        if (Math.random() < winPercentage) {
-                            var n = 2 * t;
-                            (credits += n), showMessage("💘Congrats! You won " + n + " credits!", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits);
-                        } else showMessage("You lost, try again.👍", "bg-message");
-                    else showMessage("Insufficient credits 💰", "bg-message");
-                    setMinimumBetAmount();
-                }
-            }
-            function deductCredits(e) {
-                return credits >= e && ((credits -= e), !0);
-            }
-            function setMinimumBetAmount() {
-                var e = credits > 1e5 ? Math.ceil(0.5 * credits) : Math.ceil(0.07 * credits),
-                    t = document.getElementById("betAmountInput");
-                (t.placeholder = "Minimum bet: " + e), (t.min = e), (t.style.backgroundColor = "#00bfff");
-            }
-            function todCredits() {
-                var e = Math.floor(50 * Math.random()) + 1;
-                (credits += e), showMessage("You borrowed " + e + "💎 credits.", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits);
-            }
-            function giveToPoor() {
-                var e = Math.ceil(0.15 * credits);
-                deductCredits(e)
-                    ? (showMessage("You gave " + e + "💎 credits to the poor.", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits))
-                    : showMessage("Insufficient credits to give to the poor.", "bg-message");
-            }
-            function displayRandomNumber() {
-                (currentNumber = Math.floor(50 * Math.random()) + 1), (document.getElementById("bingoNumberDisplay").textContent = "Next number: " + currentNumber), setTimeout(displayRandomNumber, 5e3);
-            }
-            function datePartner() {
-                var e = Math.random() < 0.4,
-                    t = Math.ceil(0.2 * credits);
-                e
-                    ? ((credits += t), showMessage("You gained " + t + "💎 credits from dating a partner.", "bg-message"))
-                    : deductCredits(t)
-                    ? showMessage("You lost " + t + "💎 credits from dating a partner.", "bg-message")
-                    : showMessage("Insufficient credits for dating a partner.", "bg-message"),
-                    updateAchievementsAndTitles(credits),
-                    localStorage.setItem("credits", credits);
-            }
-            function updateTitles(e) {
-                var t = [
-                    { threshold: 255e4, title: "Superstar" },
-                    { threshold: 155e4, title: "Prodigy" },
-                    { threshold: 105e4, title: "Hero" },
-                    { threshold: 75e4, title: "Sensei" },
-                    { threshold: 65e4, title: "Master" },
-                    { threshold: 55e4, title: "Otaku" },
-                    { threshold: 45e4, title: "Nerd" },
-                    { threshold: 35e4, title: "Geek" },
-                    { threshold: 25e4, title: "Scholar" },
-                    { threshold: 15e4, title: "Guru" },
-                    { threshold: 1e5, title: "Expert" },
-                    { threshold: 9e4, title: "Connoisseur" },
-                    { threshold: 8e4, title: "Superfan" },
-                    { threshold: 7e4, title: "Devotee II" },
-                    { threshold: 6e4, title: "Enthusiast II" },
-                    { threshold: 5e4, title: "Devotee" },
-                    { threshold: 4e4, title: "Aficionado" },
-                    { threshold: 3e4, title: "Fanatic" },
-                    { threshold: 25e3, title: "Apprentice" },
-                    { threshold: 15e3, title: "Enthusiast" },
-                    { threshold: 1e4, title: "Novice" },
-                    { threshold: 8e3, title: "Amateur" },
-                    { threshold: 6e3, title: "Rookie" },
-                    { threshold: 4e3, title: "Fan" },
-                    { threshold: 2e3, title: "Fun" },
-                    { threshold: 100, title: "Casual" },
-                ].filter(function (t) {
-                    return e >= t.threshold;
-                });
-                t.sort(function (e, t) {
-                    return t.threshold - e.threshold;
-                }),
-                    updateSubmenu("titleSubmenu", t, "title");
-            }
-            function prevSlide() {
-                currentSlideIndex = (currentSlideIndex - 1 + slideshowImages.length) % slideshowImages.length;
-                var e = document.getElementById("fullscreenImage");
-                e.classList.remove("active"),
-                    setTimeout(function () {
-                        (e.src = slideshowImages[currentSlideIndex]), e.classList.add("active");
-                    }, 500);
-            }
-            function updateAchievements(e) {
-                var t = [
-                    { threshold: 100, name: "Anime Novice" },
-                    { threshold: 500, name: "Cosplay Apprentice" },
-                    { threshold: 2500, name: "Anime Watcher" },
-                    { threshold: 5e3, name: "Anime Reviewer" },
-                    { threshold: 1e4, name: "Manga Critic" },
-                    { threshold: 2e4, name: "Trivia Buff" },
-                    { threshold: 3e4, name: "Completionist" },
-                    { threshold: 4e4, name: "Analysis Expert" },
-                    { threshold: 5e4, name: "Marathon Champion" },
-                    { threshold: 6e4, name: "Encyclopedia Holder" },
-                    { threshold: 75e3, name: "Fiction Fanatic" },
-                    { threshold: 1e5, name: "Otaku Philosopher" },
-                    { threshold: 25e4, name: "Merch Master" },
-                    { threshold: 35e4, name: "Romance Royalty" },
-                    { threshold: 55e4, name: "Aficionado" },
-                    { threshold: 65e4, name: "Dungeon Delver" },
-                    { threshold: 75e4, name: "History Buff" },
-                    { threshold: 105e4, name: "Comedy Connoisseur" },
-                    { threshold: 125e4, name: "Anime Archaeologist" },
-                    { threshold: 205e4, name: "Thriller Pro" },
-                    { threshold: 255e4, name: "Gaming Guru" },
-                    { threshold: 355e4, name: "Sci-Fi Specialist" },
-                    { threshold: 455e4, name: "Anime Traveler" },
-                    { threshold: 555e4, name: "Anime Podcast Pro" },
-                    { threshold: 655e4, name: "Legendary Anime Master" },
-                    { threshold: 755e4, name: "Emperor" },
-                ].filter(function (t) {
-                    return e >= t.threshold;
-                });
-                t.sort(function (e, t) {
-                    return t.threshold - e.threshold;
-                }),
-                    updateSubmenu("achievementsSubmenu", t, "name");
-            }
-            function updateSubmenu(e, t, o) {
-                var n = document.getElementById(e);
-                (n.innerHTML = ""),
-                    t.slice(0, Math.min(4, t.length)).forEach(function (e) {
-                        var t = document.createElement("li"),
-                            r = document.createElement("a");
-                        (r.href = "javascript:void(0)"), (r.textContent = e[o]), t.appendChild(r), n.appendChild(t);
-                    });
-            }
-            function showCredits() {
-                showMessage("You have " + credits + "💎 credits.", "bg-message");
-            }
-            function closeMenu() {
-                var e = document.querySelector(".menu");
-                (e.style.transition = "opacity 7s"),
-                    (e.style.opacity = 0),
-                    setTimeout(function () {
-                        e.style.display = "none";
-                    }, 5e3);
-            }
-            function startBingo() {
-                var e = document.getElementById("bingo-board");
-                if (bingoBoardVisible) (e.style.display = "none"), (bingoBoardVisible = !1);
-                else {
-                    (e.style.display = "block"), (bingoBoardVisible = !0);
-                    var t = document.getElementById("bingoGrid");
-                    (t.innerHTML = ""),
-                        generateRandomNumbers(1, 50, 25).forEach(function (e) {
-                            var o = document.createElement("div");
-                            (o.className = "bingo-cell"),
-                                (o.textContent = e),
-                                o.setAttribute("data-clicked", "false"),
-                                (o.onclick = function () {
-                                    o.textContent == currentNumber && "false" === o.getAttribute("data-clicked") && (o.classList.add("selected"), o.setAttribute("data-clicked", "true"), checkBingo());
-                                }),
-                                t.appendChild(o);
-                        }),
-                        displayRandomNumber();
-                }
-            }
-            function loadImagesFromDB() {
-                var e = db.transaction(["images"], "readonly").objectStore("images").openCursor(null, "prev");
-                (e.onsuccess = function (e) {
-                    var t = e.target.result;
-                    if (t) {
-                        var o = t.value.url,
-                            n = document.getElementById("imageGallery"),
-                            r = document.createElement("div");
-                        r.className = "gallery-item";
-                        var a = document.createElement("img");
-                        (a.src = o),
-                            (a.alt = "Image"),
-                            (a.onclick = function () {
-                                openFullscreenSlideshow(o);
-                            }),
-                            r.appendChild(a);
-                        var s = document.createElement("span");
-                        (s.innerHTML = "&times;"),
-                            (s.className = "delete-btn"),
-                            (s.onclick = function () {
-                                n.removeChild(r), deleteImageFromDB(o);
-                            }),
-                            r.appendChild(s),
-                            n.appendChild(r),
-                            t.continue();
-                    }
-                }),
-                    (e.onerror = function (t) {
-                        console.error("Error loading images from IndexedDB:", e.error);
-                    });
-            }
-            function generateRandomNumbers(e, t, o) {
-                for (var n = []; n.length < o; ) {
-                    var r = Math.floor(Math.random() * (t - e + 1)) + e;
-                    n.includes(r) || n.push(r);
-                }
-                return n;
-            }
-            function checkBingo() {
-                for (var e = document.querySelectorAll(".bingo-cell"), t = [], o = 0; o < 25; o += 5)
-                    t.push(
-                        Array.from(e)
-                            .slice(o, o + 5)
-                            .map((e) => e.classList.contains("selected"))
-                    );
-                var n = t.some((e) => e.every((e) => e)),
-                    r = t[0].some((e, o) => t.every((e) => e[o])),
-                    a = t.every((e, t) => e[t]),
-                    s = t.every((e, t) => e[4 - t]);
-                (n || r || a || s) &&
-                    ((credits += 200),
-                    showMessage("Congrats! Bingo boost enabled. You've earned 200💎 credits", "bg-message"),
-                    updateAchievementsAndTitles(credits),
-                    localStorage.setItem("credits", credits),
-                    document.querySelectorAll(".bingo-cell").forEach((e) => {
-                        e.onclick = function () {
-                            e.textContent == currentNumber && "false" === e.getAttribute("data-clicked") && (e.classList.add("selected"), e.setAttribute("data-clicked", "true"), checkBingoWithBoost());
-                        };
-                    }));
-            }
-            function openGallery() {
-                document.getElementById("galleryOverlay").style.display = "flex";
-            }
-            function applyColors() {
-                var e = document.getElementById("backgroundColorInput").value,
-                    t = document.getElementById("fontColorInput").value,
-                    o = document.getElementById("hoverColorInput").value;
-                localStorage.setItem("backgroundColor", e), localStorage.setItem("fontColor", t), localStorage.setItem("hoverColor", o), applyStoredColors();
-            }
-            function checkBingoWithBoost() {
-                for (var e = document.querySelectorAll(".bingo-cell"), t = [], o = 0; o < 25; o += 5)
-                    t.push(
-                        Array.from(e)
-                            .slice(o, o + 5)
-                            .map((e) => e.classList.contains("selected"))
-                    );
-                var n = t.some((e) => e.every((e) => e)),
-                    r = t[0].some((e, o) => t.every((e) => e[o])),
-                    a = t.every((e, t) => e[t]),
-                    s = t.every((e, t) => e[4 - t]);
-                (n || r || a || s) && ((credits += 300), showMessage("Congrats! You've earned 300💎 bingo bonus", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits)),
-                    Array.from(e).every((e) => e.classList.contains("selected")) &&
-                        ((credits += 1e3), showMessage("Bingo Champ! You've earned 1000💎 Master Bonus!", "bg-message"), updateAchievementsAndTitles(credits), localStorage.setItem("credits", credits));
-            }
-            function updateAchievementsAndTitles(e) {
-                updateTitles(e), updateAchievements(e);
-            }
-            function toggleColorBoard() {
-                var e = document.getElementById("colorBoard");
-                e.style.display = "block" === e.style.display ? "none" : "block";
-            }
-            function applyStoredColors() {
-                var e = localStorage.getItem("backgroundColor") || "#000000",
-                    t = localStorage.getItem("fontColor") || "#C0C0C0",
-                    o = localStorage.getItem("hoverColor") || "#36454F";
-                document.querySelectorAll(".menu, .submenu, .message, #logic-board, #music-board, #bingo-board, .color-board").forEach(function (o) {
-                    (o.style.backgroundColor = e), (o.style.color = t);
-                }),
-                    document.querySelectorAll(".menu li").forEach(function (t) {
-                        t.addEventListener("mouseenter", function () {
-                            this.style.backgroundColor = o;
-                        }),
-                            t.addEventListener("mouseleave", function () {
-                                this.style.backgroundColor = e;
-                            });
-                    }),
-                    document.querySelectorAll(".menu a, .submenu a, .message, #logic-board, #music-board, #bingo-board, .color-board").forEach(function (e) {
-                        e.style.color = t;
-                    }),
-                    (document.getElementById("backgroundColorInput").value = e),
-                    (document.getElementById("fontColorInput").value = t),
-                    (document.getElementById("hoverColorInput").value = o);
-            }
-            function reset() {
-                localStorage.removeItem("bannerImage"),
-                    localStorage.removeItem("bgImage"),
-                    localStorage.removeItem("backgroundColor"),
-                    localStorage.removeItem("fontColor"),
-                    localStorage.removeItem("hoverColor"),
-                    (document.body.style.backgroundImage = defaultBg),
-                    (document.querySelector(".hero-image.has-image").style.backgroundImage = defaultBanner),
-                    applyStoredColors();
-            }
-            function closeGallery() {
-                document.getElementById("galleryOverlay").style.display = "none";
-            }
-            function openFullscreenSlideshow(e) {
-                var t = document.getElementById("fullscreenImage");
-                (t.src = e),
-                    (document.getElementById("fullscreenSlideshow").style.display = "flex"),
-                    (slideshowImages = Array.from(document.querySelectorAll(".gallery-item img")).map((e) => e.src)),
-                    (currentSlideIndex = slideshowImages.indexOf(e)),
-                    (t.style.transform = "scale(1)"),
-                    (t.style.opacity = "1"),
-                    t.addEventListener("mouseenter", function () {
-                        this.style.transform = "scale(1.7)";
-                    }),
-                    t.addEventListener("mouseleave", function () {
-                        this.style.transform = "scale(1)";
-                    });
-            }
-            function closeFullscreenSlideshow() {
-                document.getElementById("fullscreenImage").classList.remove("active"),
-                    setTimeout(function () {
-                        document.getElementById("fullscreenSlideshow").style.display = "none";
-                    }, 500);
-            }
-            window.onload = function () {
-                applyStoredColors();
-            };
-        </script>
 
+#user-list_badges {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 20px;
+	width: 100%;
+	max-width: 600px;
+	display: none;
+}
+.user-card_badges {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border: 1px solid rgba(255, 255, 255, 0.8); /* Light border for contrast */
+	border-radius: 16px;
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+	padding: 20px;
+	margin: 15px 0;
+	width: 100%;
+	max-width: 380px;
+	max-height: 240px;
+	transition: transform 0.3s, box-shadow 0.3s;
+	cursor: pointer;
+	box-sizing: border-box;
+	position: relative;
+}
+.user-card_badges:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+.profile-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+}
+.profile-picture {
+	width: 90px;
+	height: 90px;
+	border-radius: 50%;
+	object-fit: cover;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	margin-bottom: 10px;
+}
+.user-details {
+	text-align: center; /* Center-align text for better layout */
+	background-color: rgba(30, 30, 30, 0.3); /* Semi-transparent background */
+	border-radius: 10px;
+	padding: 10px 15px;
+	width: 100%;
+	max-width: 450px;
+}
+.user-name_badges {
+	font-size: 17px;
+	color: silver;
+	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(30, 30, 30, 0.3); /* Semi-transparent background */
+	border-radius: 10px;
+	padding: 10px 15px;
+	width: 100%;
+	max-width: 450px;
+	box-sizing: border-box; /* Ensure padding doesn't affect width */
+	border: 1px solid rgba(255, 255, 255, 0.8); /* Thin border around username */
+}
+.tickmark {
+	width: 16px;
+	height: 16px;
+	background-size: cover;
+	margin-right: 10px;
+	order: -1;
+}
+.user-level_badges {
+	font-size: 16px;
+	color: silver;
+	margin-top: 5px;
+}
+@media (max-width: 400px) {
+	.user-card_badges {
+    	padding: 15px;
+	}
+	.profile-picture {
+    	margin-bottom: 15px;
+	}
+	.user-name_badges {
+    	font-size: 18px;
+	}
+	.user-level_badges {
+    	font-size: 14px;
+	}
+}
+.user-level_badges {
+	font-size: 14px;
+	margin-top: 5px;
+	color: silver; /* Adjust text color to black for contrast */
+	padding: 5px 10px; /* Padding for spacing */
+	border-radius: 8px; /* Rounded corners */
+}
+#side-nav_badges {
+	position: fixed;
+	top: 0;
+	right: -100%;
+	width: 100%;
+	height: 100vh; /* Ensure it takes full viewport height */
+	background: url('https://wallpaperaccess.com/full/629769.jpg') no-repeat center center;
+	background-size: cover;
+	color: #f5f5f5;
+	box-shadow: -2px 0 12px rgba(0, 0, 0, 0.2);
+	transition: right 0.3s ease;
+	padding: 20px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	z-index: 1000;
+	overflow-y: auto;
+}
+
+#side-nav_badges.active_badges {
+	right: 0;
+}
+#side-nav_badges .close-btn_badges {
+	align-self: flex-end;
+	font-size: 28px;
+	cursor: pointer;
+	color: #ff4d4d;
+	margin-bottom: 20px;
+}
+
+#side-nav_badges .username-heading_badges {
+    display: flex;
+    align-items: center;
+    font-size: 17px;
+    font-weight: 700;
+    color: #f5f5f5;
+    margin-bottom: 20px;
+    background-image: url('https://img.freepik.com/premium-photo/silhouette-girl-gazing-neonlit-city-skyline-night_328146-7625.jpg'); /* Updated image URL */
+    background-size: cover; /* Ensures the image covers the full area */
+    background-position: center center; /* Centers the image */
+    height: 150px; /* Fixed height */
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    
+}
+
+
+
+#side-nav_badges .username-heading_badges img {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-right: 15px;
+}
+#badge-display_badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	flex: 1;
+	margin-top: 20px;
+	justify-content: center;
+}
+.badge-container_badges {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 15px;
+	padding: 15px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	transition: transform 0.3s, box-shadow 0.3s;
+	height: 140px;
+	width: 120px;
+}
+.badge-container_badges:hover {
+	transform: scale(1.1);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+.badge_badges {
+	width: 100px;
+	height: 100px;
+	border-radius: 12px;
+	object-fit: cover;
+	background: rgba(255, 255, 255, 0.4);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	margin-bottom: 10px;
+	transition: transform 0.3s;
+}
+.badge_badges:hover {
+	transform: scale(1.3);
+}
+.badge-name_badges {
+	margin-top: 5px;
+	font-size: 14px;
+	color: #ddd;
+	background: rgba(0, 0, 0, 0.5);
+	padding: 5px;
+	border-radius: 6px;
+	text-align: center;
+}
+@media (max-width: 400px) {
+	.user-card_badges {
+    	flex-direction: column;
+    	align-items: flex-start;
+    	padding: 15px;
+	}
+	.profile-picture {
+    	margin-bottom: 15px;
+	}
+	.user-name_badges {
+    	margin-bottom: 10px;
+    	padding-right: 0;
+	}
+	.tickmark {
+    	position: static;
+    	margin-left: 10px;
+	}
+	.user-level_badges {
+    	margin-top: 5px;
+	}
+}
+#toggle-btn_badges {
+	position: relative;
+	top: 10px;
+	left: 10px;
+	background-color: #121212;
+	color: #f5f5f5;
+	border: none;
+	border-radius: 5px;
+	padding: 10px 20px;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	transition: background-color 0.3s, transform 0.3s;
+	z-index: 1001;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+#toggle-btn_badges:hover {
+	background-color: #1e1e1e;
+	transform: scale(1.05);
+}
+#toggle-btn_badges.hidden {
+	display: none;
+}
+.ribbon-top-right_badges {
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	width: 80px;
+	height: 80px;
+}
+.ribbon-bottom-left_badges {
+	position: absolute;
+	bottom: -1px;
+	left: -1px;
+	width: 80px;
+	height: 80px;
+}
+
+.star-rating {
+	display: flex;
+	justify-content: center;
+	margin-top: 5px;
+}
+
+.star-rating i {
+	font-size: 11px;
+	margin: 0 2px;
+}
+    #search-input::placeholder {
+        font-weight: bold; /* Makes the placeholder text bold */
+        color: white; /* Changes the placeholder text color to white */
+    }
+	</style>
+</head>
+<body class="body_badge">
+<button id="toggle-btn_badges">Badges and Leveling </button>
+<!-- Added search input below the toggle button -->
+	<input 
+    type="text" 
+    id="search-input" 
+    placeholder="Search by name..." 
+    style="padding: 10px; margin-top: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ddd; background-color: black; color: white;">
+
+	<div id="user-list_badges">
+    	<!-- User list will be dynamically generated -->
+	</div>
+	<div id="side-nav_badges">
+    	<div class="close-btn_badges" onclick="toggleSideNav_badges(false)">✖</div>
+    	<div class="username-heading_badges" id="username-heading_badges"></div>
+    	<div id="badge-display_badges">
+        	<!-- Badges for the selected user will be displayed here -->
+    	</div>
+	</div>
+	<script>
+    	const badges_badges = [
+	{ url: 'https://i.ibb.co/N2ghJDz/Levi.gif', name: 'Levi Sentinel' },
+	{ url: 'https://i.ibb.co/nDb7WDr/Frieren.gif', name: 'Frieren Wanderer' },
+	{ url: 'https://i.ibb.co/0GFn75W/Yor-Forger.gif', name: 'Yor Phantom' },
+	{ url: 'https://i.ibb.co/rvYt9FG/Ai-Hoshino.gif', name: 'Ai Radiance' },
+	{ url: 'https://i.ibb.co/BrQpKXP/D-Luffy.gif', name: 'Luffy Voyager' },
+	{ url: 'https://i.ibb.co/pwTfZg5/Satoru-Gojo.gif', name: 'Gojo Infinity' },
+];
+const starColors = ['#FFD700', '#C0C0C0', '#CD7F32']; // Gold, Silver, Bronze
+
+const badges_tick = [
+	'https://cdn-icons-png.flaticon.com/512/8358/8358886.png',
+	'https://cdn-icons-png.flaticon.com/512/2143/2143150.png',
+	'https://www.iconpacks.net/icons/free-icons-6/free-dark-green-verified-sign-and-tick-icon-18747-thumb.png',
+	'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Eo_circle_purple_white_checkmark.svg/1024px-Eo_circle_purple_white_checkmark.svg.png',
+	'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Eo_circle_orange_checkmark.svg/1200px-Eo_circle_orange_checkmark.svg.png',
+];
+const ribbons_badges = [
+	'https://i.ibb.co/3fq9z0K/topp.png',
+	'https://i.ibb.co/7r0mgHh/bottom22.png',
+];
+
+function getStarRating(level) {
+	const stars = [];
+	const colorIndex = Math.floor(level / 5) % starColors.length;
+	const color = starColors[colorIndex];
+
+	// Calculate how many stars should be filled with the current color
+	const fullStars = level % 5;
+
+	for (let i = 0; i < 5; i++) {
+    	if (i < fullStars) {
+        	stars.push(`<i class="fas fa-star" style="color:${color}"></i>`);
+    	} else {
+        	stars.push(`<i class="far fa-star" style="color:${color}"></i>`);
+    	}
+	}
+
+	return stars.join('');
+}
+
+function addRibbonsToBadges() {
+	const badgeContainers = document.querySelectorAll('.badge-container_badges');
+	badgeContainers.forEach((container, index) => {
+    	const ribbonContainer = document.createElement('div');
+    	ribbonContainer.className = 'ribbon-container_badges';
+    	const topRightRibbon = document.createElement('img');
+    	topRightRibbon.src = ribbons_badges[0];
+    	topRightRibbon.className = 'ribbon-top-right_badges';
+    	const bottomLeftRibbon = document.createElement('img');
+    	bottomLeftRibbon.src = ribbons_badges[1];
+    	bottomLeftRibbon.className = 'ribbon-bottom-left_badges';
+    	ribbonContainer.appendChild(topRightRibbon);
+    	ribbonContainer.appendChild(bottomLeftRibbon);
+    	container.appendChild(ribbonContainer);
+	});
+}
+  	let users_badges = [
+	{ name: 'Power', badges: [0, 1, 2, 3, 4, 5], profilePicture: 'https://cdn.pixabay.com/photo/2024/08/01/18/20/anime-8937915_640.png' },
+	{ name: 'Yumeko', badges: [0,1,2], profilePicture: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQGhoYAg5gFC7oXP1EzMCnr9oBBVYW4BBmK-2YGIrZdLxjd-5dRnLR3P9qhdqAchTg6RI&usqp=CAU' }
+];
+document.getElementById('toggle-btn_badges').addEventListener('click', () => {
+	const userListBadges = document.getElementById('user-list_badges');
+	if (userListBadges.style.display === 'none' || userListBadges.style.display === '') {
+    	userListBadges.style.display = 'flex';
+	} else {
+    	userListBadges.style.display = 'none';
+	}
+});
+    	function calculateLevel(badges) {
+        	return badges.length; // Level is equal to the number of badges
+    	}
+    	function getBadgeImage(level) {
+        	if (level > 0) {
+            	const index = Math.floor(level / 5) % badges_tick.length;
+            	return badges_tick[index];
+        	}
+        	return '';
+    	}
+ 	// Handle search input to filter users by name
+    	document.getElementById('search-input').addEventListener('input', renderUserList_badges);
+    	function renderUserList_badges() {
+        	const userList_badges = document.getElementById('user-list_badges');
+	const searchQuery = document.getElementById('search-input').value.toLowerCase(); // Capture search input
+        	userList_badges.innerHTML = '';
+        	users_badges
+  .filter(user => user.name.toLowerCase().includes(searchQuery)) // Filter users based on the search query
+            	.sort((a, b) => calculateLevel(b.badges) - calculateLevel(a.badges))
+            	.forEach(user => {
+                	user.level = calculateLevel(user.badges);
+                	const userCard_badges = createUserCard_badges(user);
+                	userList_badges.appendChild(userCard_badges);
+            	});
+    	}
+function createUserCard_badges(user) {
+	const userCard_badges = document.createElement('div');
+	userCard_badges.className = 'user-card_badges';
+	userCard_badges.dataset.username = user.name;
+
+	const profileContainer = document.createElement('div');
+	profileContainer.className = 'profile-container';
+
+	const profilePicture = document.createElement('img');
+	profilePicture.src = user.profilePicture;
+	profilePicture.className = 'profile-picture';
+
+	const userDetails = document.createElement('div');
+	userDetails.className = 'user-details';
+
+	const userName_badges = document.createElement('div');
+	userName_badges.className = 'user-name_badges';
+	userName_badges.textContent = user.name;
+
+	const tickmark = document.createElement('div');
+	tickmark.className = 'tickmark';
+	tickmark.style.backgroundImage = `url('${getBadgeImage(user.level)}')`;
+
+	const userLevel_badges = document.createElement('div');
+	userLevel_badges.className = 'user-level_badges';
+	userLevel_badges.textContent = `Level: ${user.level}`;
+
+	const starRating = document.createElement('div');
+	starRating.className = 'star-rating';
+	starRating.innerHTML = getStarRating(user.level);
+
+	userName_badges.prepend(tickmark);
+	userDetails.appendChild(userName_badges);
+	userDetails.appendChild(userLevel_badges);
+	userDetails.appendChild(starRating); // Append star rating under the level
+
+	profileContainer.appendChild(profilePicture);
+	profileContainer.appendChild(userDetails);
+	userCard_badges.appendChild(profileContainer);
+
+	userCard_badges.addEventListener('click', () => {
+    	displayUserBadges(user);
+	});
+
+	return userCard_badges;
+}
+
+function toggleSideNav_badges(open, user = null) {
+	const sideNav_badges = document.getElementById('side-nav_badges');
+	const toggleBtn_badges = document.getElementById('toggle-btn_badges');
+	if (open) {
+    	if (user) {
+        	const usernameHeading = document.getElementById('username-heading_badges');
+        	usernameHeading.innerHTML = `
+            	<img src="${user.profilePicture}" alt="${user.name}'s profile picture" />
+            	${user.name}
+        	`;
+        	const badgeDisplay_badges = document.getElementById('badge-display_badges');
+        	badgeDisplay_badges.innerHTML = '';
+        	// Sort the badges array for display in descending order based on index
+        	user.badges.sort((a, b) => b - a).forEach(index => {
+            	const badgeContainer_badges = document.createElement('div');
+            	const badgeImg_badges = document.createElement('img');
+            	const badgeName_badges = document.createElement('div');
+            	badgeContainer_badges.className = 'badge-container_badges';
+            	badgeImg_badges.src = badges_badges[index].url;
+            	badgeImg_badges.className = 'badge_badges';
+            	badgeName_badges.textContent = badges_badges[index].name;
+            	badgeName_badges.className = 'badge-name_badges';
+            	badgeContainer_badges.appendChild(badgeImg_badges);
+            	badgeContainer_badges.appendChild(badgeName_badges);
+            	badgeDisplay_badges.appendChild(badgeContainer_badges);
+        	});
+        	sideNav_badges.classList.add('active_badges');
+        	toggleBtn_badges.classList.add('hidden'); // Hide the button
+        	addRibbonsToBadges();
+    	}
+	} else {
+    	sideNav_badges.classList.remove('active_badges');
+    	toggleBtn_badges.classList.remove('hidden'); // Show the button
+	}
+}
+    	document.getElementById('user-list_badges').addEventListener('click', (event) => {
+        	if (event.target.closest('.user-card_badges')) {
+            	const username = event.target.closest('.user-card_badges').dataset.username;
+            	const user = users_badges.find(u => u.name === username);
+            	toggleSideNav_badges(true, user);
+        	}
+    	});
+    	renderUserList_badges();
+	</script>
+</body>
+</html>
+ 
+  
 
 
 
